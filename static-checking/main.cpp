@@ -13,43 +13,72 @@ class DataManager {
     data = new int[size];
 
     for (int i = 0; i < size; i++) {
-      if (i % 2 == 0) data[i] = i * 2;
+      data[i] = (i % 2 == 0) ? i * 2 : 0;
     }
   }
 
-  void print() {
-    for (int i = 0; i <= size; i++) {
+  // Copy constructor
+  DataManager(const DataManager& other) {
+    size = other.size;
+    data = new int[size];
+
+    for (int i = 0; i < size; i++) {
+      data[i] = other.data[i];
+    }
+  }
+
+  // Copy assignment operator
+  DataManager& operator=(const DataManager& other) {
+    if (this != &other) {
+      delete[] data;
+
+      size = other.size;
+      data = new int[size];
+
+      for (int i = 0; i < size; i++) {
+        data[i] = other.data[i];
+      }
+    }
+
+    return *this;
+  }
+
+  void print() const {
+    for (int i = 0; i < size; i++) {
       std::cout << data[i] << " ";
     }
     std::cout << '\n';
   }
 
-  int getValue(int index) {
-    if (index < size) return data[index];
+  int getValue(int index) const {
+    if (index >= 0 && index < size) {
+      return data[index];
+    }
 
-    return data[0];
+    return 0;
   }
 
-  ~DataManager() { delete data; }
+  ~DataManager() {
+    delete[] data;
+  }
 };
 
-void unsafeFunction() {
+void safeFunction() {
   char buffer[10];
 
-  strcpy(buffer, "This is way too long for buffer");
+  std::strncpy(buffer, "TooLong", sizeof(buffer) - 1);
+  buffer[sizeof(buffer) - 1] = '\0';
 
   std::cout << buffer << '\n';
 }
 
-int globalVar = 0;
-
 int compute(int x) {
-  int result;
+  int result = 0;
 
   if (x > 10)
     result = x * 2;
   else if (x < 0)
-    return result;
+    return 0;
 
   return result;
 }
@@ -62,6 +91,9 @@ void memoryLeakDemo() {
   *leak2 = 20;
 
   std::cout << leak1[0] + *leak2 << '\n';
+
+  delete[] leak1;
+  delete leak2;
 }
 
 void vectorIssues() {
@@ -70,10 +102,15 @@ void vectorIssues() {
   v.push_back(1);
   v.push_back(2);
 
-  std::cout << v[10] << '\n';
+  if (v.size() > 10) {
+    std::cout << v[10] << '\n';
+  }
 
   v.clear();
-  std::cout << v.front() << '\n';
+
+  if (!v.empty()) {
+    std::cout << v.front() << '\n';
+  }
 }
 
 int main() {
@@ -81,7 +118,7 @@ int main() {
 
   dm.print();
 
-  unsafeFunction();
+  safeFunction();
 
   std::cout << compute(5) << '\n';
 
