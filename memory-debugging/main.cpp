@@ -1,71 +1,70 @@
 #include <iostream>
 
 struct Node {
-  int value;
-  Node* next;
+    int value;
+    Node* next;
 };
 
 Node* createList(int n) {
-  Node* head = new Node;
-  head->value = 0;
-  head->next = nullptr;
+    Node* head = new Node;
+    head->value = 0;
+    head->next = nullptr;
 
-  Node* current = head;
+    Node* current = head;
 
-  for (int i = 1; i < n; i++) {
-    current->next = new Node;
-    current = current->next;
-    current->value = i;
-    current->next = nullptr;
-  }
+    for (int i = 1; i < n; i++) {
+        current->next = new Node;
+        current = current->next;
+        current->value = i;
+        current->next = nullptr;
+    }
 
-  return head;
+    return head;
 }
 
 void printList(Node* head) {
-  Node* temp = head;
+    Node* temp = head;
 
-  while (temp != nullptr) {
-    std::cout << temp->value << " ";
-    temp = temp->next;
-  }
-  std::cout << '\n';
+    while (temp != nullptr) {
+        std::cout << temp->value << " ";
+        temp = temp->next;
+    }
+    std::cout << '\n';
 }
 
 void freeList(Node* head) {
-  Node* temp = head;
+    Node* temp = head;
 
-  while (temp != nullptr) {
-    Node* next = temp->next;
-    delete temp;
-    temp = next;
-  }
+    while (temp != nullptr) {
+        Node* next = temp->next;
+        delete temp;
+        temp = next;
+    }
 }
 
 int main() {
-  Node* list = createList(5);
+    Node* list = createList(5);
 
-  printList(list);
+    printList(list);
 
-  freeList(list);
+    freeList(list);
+    list = nullptr;
 
-  std::cout << list->value << '\n';
+    freeList(list);
 
-  freeList(list);
+    Node* leakNode = new Node;
+    leakNode->value = 99;
+    leakNode->next = nullptr;
 
-  Node* leakNode = new Node;
-  leakNode->value = 99;
-  leakNode->next = nullptr;
+    std::cout << leakNode->value << '\n';
+    delete leakNode;
 
-  std::cout << leakNode->value << '\n';
+    int* arr = new int[3];
+    arr[0] = 1;
+    arr[1] = 2;
+    arr[2] = 999;
 
-  int* arr = new int[3];
-  arr[0] = 1;
-  arr[1] = 2;
-  arr[2] = 3;
-  arr[5] = 999;
+    delete[] arr;
 
-  delete[] arr;
-
-  return 0;
+    return 0;
 }
